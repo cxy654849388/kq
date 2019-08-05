@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chm.kd.kq.mapper.QuestionAnswerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.chm.kd.kq.entity.QuestionAnswer">
+        <id column="ID" property="id"/>
+        <result column="QUESTION_ID" property="questionId"/>
+        <result column="GROUP_ID" property="groupId"/>
+        <result column="QUESTION" property="question"/>
+        <result column="ANSWER" property="answer"/>
+        <result column="TYPE" property="type"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID, QUESTION_ID, GROUP_ID, QUESTION, ANSWER, TYPE
+    </sql>
+    <select id="getMaxQuestionId" resultType="java.lang.Long">
+        select max(QUESTION_ID)
+        from TBL_QUESTION_ANSWER
+        where GROUP_ID = #{groupId}
+    </select>
+
+</mapper>

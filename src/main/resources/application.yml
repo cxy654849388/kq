@@ -1,0 +1,74 @@
+cq:
+  http:
+    host: localhost
+    port: 5700
+  http-api:
+    host: localhost
+    port: 6700
+
+group:
+  switch:
+    open: 出声
+    close: 收声
+    openStr: 瓦终于可以出声啦！
+    openAgainStr: 瓦本来就能出声啊
+    closeStr: 哼！收声就收声
+    closeAgainStr: 瓦本来就没有出声啊
+
+scheduled:
+  executor:
+    corePoolSize: 10
+
+server:
+  port: 8080
+
+spring:
+  datasource:
+    #driver-class-name: org.h2.Driver
+    #schema: classpath:db/schema-h2.sql
+    #data: classpath:db/data-h2.sql
+    #url: jdbc:h2:file:./h2/kq;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE
+    #username: root
+    #password: kd
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/kq?serverTimezone=Asia/Shanghai
+    username: root
+    password: admin
+  h2:
+    console:
+      path: /h2-console
+      enabled: true
+thread:
+  group:
+    listener:
+      corePoolSize: 5
+      maxPoolSize: 20
+      keepAliveTime: 0
+      capacity: 500
+
+custom:
+  master: 654849388 # 绝对管理员
+  prompt-arrays:
+    - name: 加群
+      type: 1
+    - name: 退群
+      type: 2
+    - name: 改名
+      type: 3
+
+  switch-type-arrays:
+    - name: 问答
+      field: QUESTION_SWITCH
+    - name: 加群提示
+      field: JOIN_SWITCH
+    - name: 退群提示
+      field: QUIT_SWITCH
+    - name: 改名提示
+      field: MODIFY_CARD_SWITCH
+    - name: 提醒提示
+      field: REMIND_SWITCH
+
+
+
+
+

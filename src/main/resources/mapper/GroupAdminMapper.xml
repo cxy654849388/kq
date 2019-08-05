@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chm.kd.kq.mapper.GroupAdminMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.chm.kd.kq.entity.GroupAdmin">
+        <id column="ID" property="id"/>
+        <result column="GROUP_ID" property="groupId"/>
+        <result column="USER_ID" property="userId"/>
+        <result column="TYPE" property="type"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID, GROUP_ID, USER_ID, TYPE
+    </sql>
+    <select id="getType" resultType="java.lang.String">
+        select TYPE
+        from tbl_group_admin
+        where GROUP_ID = #{groupId}
+          and USER_ID = #{userId}
+    </select>
+
+</mapper>

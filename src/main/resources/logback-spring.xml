@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--非正式环境日志配置文件-->
+<!-- scan 配置文件如果发生改变时是否重新加载 -->
+<!-- scanPeriod 监控配置文件是否有修改的时间间隔 -->
+<!-- debug 是否打印logback的内部日志 -->
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <!--控制台日志颜色-->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%date{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level)[%boldYellow(%thread)]%boldCyan(%logger){56}.%method:%L -%msg%n"/>
+    <!-- 日志输出的根路径 -->
+    <property name="log_path" value="./logs"/>
+    <!-- 模块名称， 影响日志配置名，日志文件名 -->
+    <property name="log_module_name" value="kq"/>
+    <!-- 日志文件大小 -->
+    <property name="log_max_size" value="100MB"/>
+    <!-- 日志保留的历史天数 -->
+    <property name="log_max_history" value="30"/>
+
+    <!-- 详细的业务日志，包括各个级别（info、debug、sql可配置）、sql日志、错误日志的打印，是统一的汇总日志目录 -->
+    <property name="log_app" value="${log_path}/${log_module_name}/app"/>
+    <!-- 打印用于运维监控的日志 -->
+    <property name="log_access" value="${log_path}/${log_module_name}/access"/>
+    <!-- 接口日志打印，该服务本身被请求的接口 -->
+    <property name="log_interface" value="${log_path}/${log_module_name}/interface"/>
+    <!-- 错误日志，包括业务错误日志、系统错误日志，是所有错误日志的汇总（这些错误日志在app中有一份） -->
+    <property name="log_error" value="${log_path}/${log_module_name}/error"/>
+    <!-- 第三方接口日志，调用第三方接口服务（dubbo、webservice） -->
+    <property name="log_remote" value="${log_path}/${log_module_name}/remote"/>
+    <!-- 同步日志到大数据 -->
+    <property name="log_flume" value="${log_path}/${log_module_name}/flume"/>
+    <!-- druid监控、线程池日志 -->
+    <property name="log_druid" value="${log_path}/${log_module_name}/druid"/>
+    <!-- 其他日志 -->
+    <property name="log_other" value="${log_path}/${log_module_name}/other"/>
+
+    <!-- 控制台输出，非开发环境不做输出 -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--<charset>UTF-8</charset>-->
+            <Pattern>${CONSOLE_LOG_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- 详细的业务日志，包括各个级别（info、debug、sql可配置）、sql日志、错误日志的打印，是统一的汇总日志目录 app -->
+    <appender name="log_app" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 设置日志不超过${log_max_size}时的保存路径 -->
+        <file>${log_app}/app.log</file>
+        <!-- 滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件。-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log_app}/app_%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <!-- 当天的日志大小 超过${log_max_size}时,压缩日志并保存 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${log_max_size}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 最多保留时间log_max_history -->
+            <maxHistory>${log_max_history}</maxHistory>
+        </rollingPolicy>
+        <!-- 日志输出的文件的格式  -->
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread]%logger{56}.%method:%L -%msg%n</pattern>
+        </layout>
+    </appender>
+
+    <!-- 生成运维监控的日志 access -->
+    <!-- 暂无 -->
+
+    <!-- 生成外部调用接口日志 interface -->
+    <appender name="log_interface" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_interface}/interface.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log_interface}/interface_%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${log_max_size}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>${log_max_history}</maxHistory>
+        </rollingPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread]%logger{56}.%method:%L -%msg%n</pattern>
+        </layout>
+    </appender>
+
+    <!-- 生成错误日志文件 error -->
+    <appender name="log_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${log_error}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log_error}/error_%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${log_max_size}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>${log_max_history}</maxHistory>
+        </rollingPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread]%logger{56}.%method:%L -%msg%n</pattern>
+        </layout>
+    </appender>
+
+    <!-- 调用第三方接口服务日志 remote -->
+    <appender name="log_remote" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_remote}/remote.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log_remote}/remote_%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${log_max_size}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>${log_max_history}</maxHistory>
+        </rollingPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread]%logger{56}.%method:%L -%msg%n</pattern>
+        </layout>
+    </appender>
+
+
+    <!-- 同步日志到大数据日志 flume -->
+    <!-- 无 -->
+
+    <!-- druid监控、线程池日志 druid -->
+    <!-- 可选项 -->
+
+    <!-- 其他日志 other -->
+    <!-- 可选项 -->
+
+    <!-- mybatis sql 打印到app日志中 -->
+    <logger name="java.sql.Connection" additivity="false">
+        <level>DEBUG</level>
+        <appender-ref ref="log_app"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+    <logger name="java.sql.Statement" additivity="false">
+        <level>DEBUG</level>
+        <appender-ref ref="log_app"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+    <logger name="java.sql.PreparedStatement" additivity="false">
+        <level>DEBUG</level>
+        <appender-ref ref="log_app"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <!-- 减少大量的debug日志 -->
+    <logger name="org.springframework" additivity="false">
+        <level>INFO</level>
+    </logger>
+    <logger name="springfox.documentation" additivity="false">
+        <level>INFO</level>
+    </logger>
+    <logger name="org.mybatis" additivity="false">
+        <level>INFO</level>
+    </logger>
+    <logger name="org.quartz" additivity="false">
+        <level>ERROR</level>
+    </logger>
+
+    <!-- 未由logger指定的appender都在root中指定，level默认日志级别DEBUG -->
+    <root level="DEBUG">
+        <!-- 业务日志不允许打印到控制台，所以非开发时请注释stdout -->
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="log_app"/>
+        <appender-ref ref="log_error" level="ERROR"/>
+    </root>
+</configuration>

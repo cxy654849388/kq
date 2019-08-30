@@ -63,8 +63,16 @@ public class KqMsgAdapter implements KqMsgListener {
   private SetPromptCommand setPromptCommand;
 
   @Override
+  @Transactional(rollbackFor = Exception.class, noRollbackFor = EndException.class)
   public void rePrivateMsg(PrivateMsg privateMsg) {
-
+    log.info("接收到私聊消息 {}({}):{}", privateMsg.getSender().getNickName(), privateMsg.getUserId(), privateMsg.getRawMessage());
+    String readMessage = privateMsg.getRawMessage();
+    String regex = "发送群消息 ([\\d]+) ([\\s\\S]+)";
+    if (RegexUtils.matchRegex(regex, readMessage) && privateMsg.getUserId().equals(applicationConfig.getMaster())) {
+      Long groupId = NumberUtils.createLong(StringUtils.replacePattern(readMessage, regex, "$1"));
+      String message = StringUtils.replacePattern(readMessage, regex, "$2");
+      msgApi.sendGroupMsg(groupId, message);
+    }
   }
 
   @Override
